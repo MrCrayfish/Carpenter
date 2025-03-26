@@ -64,21 +64,25 @@
 			MenuBar.addAction(exportAction, 'file.export');
 
 			Codecs.project.on('compile', compileEvent = (data) => {
-				const furniture = {};
-				for (var key in FurnitureModel.properties) {
-					if (FurnitureModel.properties[key].export == false) 
-						continue;
-					FurnitureModel.properties[key].copy(GetProjectFurnitureObj(), furniture);
+				if(data.model.format == 'furniture_model') {
+					const furniture = {};
+					for (var key in FurnitureModel.properties) {
+						if (FurnitureModel.properties[key].export == false) 
+							continue;
+						FurnitureModel.properties[key].copy(GetProjectFurnitureObj(), furniture);
+					}
+					data.model.furniture = furniture;
 				}
-				data.model.furniture = furniture;
 			});
 
 			Codecs.project.on('parse', parseEvent = (data) => {
-				const furniture = new FurnitureModel();
-				for (var key in FurnitureModel.properties) {
-					FurnitureModel.properties[key].merge(furniture, data.model.furniture)
+				if(data.model.format == 'furniture_model') {
+					const furniture = new FurnitureModel();
+					for (var key in FurnitureModel.properties) {
+						FurnitureModel.properties[key].merge(furniture, data.model.furniture)
+					}
+					Project.furniture = furniture;
 				}
-				Project.furniture = furniture;
 			});
 		},
 		onunload() {
